@@ -640,9 +640,20 @@ impl Mla {
             // Location: May also produce a supplemental item.
             if let Some(doi) = entry.doi() {
                 let mut dstr = DisplayString::new();
-                dstr.start_format(Formatting::Link(format!("https://doi.org/{}", doi)));
-                dstr += &format!("doi:{}", doi);
+                dstr.start_format(Formatting::Smallcaps);
+                dstr += "doi:";
                 dstr.commit_formats();
+                dstr.start_format(Formatting::Link(format!("https://doi.org/{}", doi)));
+                dstr += doi;
+                dstr.commit_formats();
+                location.push(dstr);
+                has_url = true;
+            } else if let Some(isbn) = entry.isbn() {
+                let mut dstr = DisplayString::new();
+                dstr.start_format(Formatting::Smallcaps);
+                dstr += "isbn:";
+                dstr.commit_formats();
+                dstr += isbn;
                 location.push(dstr);
                 has_url = true;
             } else if let Some(qurl) = entry.url() {
@@ -708,7 +719,22 @@ impl Mla {
                     if !lc.location.is_empty() {
                         lc.location += ", ";
                     }
-                    lc.location += &format!("doi:{}", doi);
+                    lc.location.start_format(Formatting::Smallcaps);
+                    lc.location += "doi:";
+                    lc.location.commit_formats();
+                    lc.location.start_format(Formatting::Link(format!(
+                        "https://doi.org/{}",
+                        doi
+                    )));
+                    lc.location += doi;
+                    lc.location.commit_formats();
+                } else if let Some(isbn) = entry.isbn() {
+                    let mut lc = ContainerInfo::new();
+                    lc.location.start_format(Formatting::Smallcaps);
+                    lc.location += "isbn:";
+                    lc.location.commit_formats();
+                    lc.location += isbn;
+                    containers.push(lc);
                 } else if let Some(qurl) = entry.url_any() {
                     let vdate = qurl.visit_date.is_some()
                         && select!(
@@ -737,10 +763,20 @@ impl Mla {
                 }
             } else if let Some(doi) = entry.doi() {
                 let mut nc = ContainerInfo::new();
+                nc.location.start_format(Formatting::Smallcaps);
+                nc.location += "doi:";
+                nc.location.commit_formats();
                 nc.location
                     .start_format(Formatting::Link(format!("https://doi.org/{}", doi)));
-                nc.location += &format!("doi:{}", doi);
+                nc.location += doi;
                 nc.location.commit_formats();
+                containers.push(nc);
+            } else if let Some(isbn) = entry.isbn() {
+                let mut nc = ContainerInfo::new();
+                nc.location.start_format(Formatting::Smallcaps);
+                nc.location += "isbn:";
+                nc.location.commit_formats();
+                nc.location += isbn;
                 containers.push(nc);
             } else if let Some(qurl) = entry.url_any() {
                 let mut nc = ContainerInfo::new();

@@ -554,6 +554,8 @@ pub enum Formatting {
     Italic,
     /// Should link to the given URL.
     Link(String),
+    /// #smallcaps([Smallcaps print])
+    Smallcaps,
 }
 
 /// Will move a format range's indicies by `o`.
@@ -722,7 +724,7 @@ impl DisplayString {
                 match f {
                     Formatting::Bold => "1",
                     Formatting::Italic => "3",
-                    Formatting::Link(_) => unreachable!(),
+                    Formatting::Link(_) | Formatting::Smallcaps => unreachable!(),
                 }
             };
             res = format!("\x1b[{}m", code) + &res;
